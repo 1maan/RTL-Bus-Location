@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Bus Locations By 1maan</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .leaflet-popup-content{
+            user-select: none;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; box-sizing: border-box;">
+    <div id="map"></div>
+    <button onclick="showUserLocation()" style="position: fixed; top: 10px; z-index: 1000; right: 10px; border: none; background-color: rgb(54, 54, 192); color: #ffffff; padding: 10px 20px; border-radius: 10px; font-weight: bold;">Location</button>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const map = L.map('map').setView([4.17478301995685, 73.50935746014017], 16); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+let busMarkers = {};
+
+const routeCodeToNameMap = {
+    "133": "R1",
+    "122": "R10",
+    "121": "R11",
+    "130": "R12",
+    "131": "R13",
+    "145": "R14",
+    "132": "R2",
+    "123": "R3",
+    "124": "R4",
+    "125": "R5",
+    "126": "R6",
+    "127": "R7",
+    "128": "R8",
+    "129": "R9"
+};
+
+function showUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const userLatitude = position.coords.latitude;
+            const userLongitude = position.coords.longitude;
+            const userLocationMarker = L.marker([userLatitude, userLongitude], { 
+                icon: L.icon({ 
+                    iconUrl: './img/user_pink.svg', 
+                    iconSize: [25, 41], 
+                    iconAnchor: [12, 41], 
+                    popupAnchor: [0, -41]
+                })
+            }).addTo(map)
+            .bindPopup("<b>Your Location</b>")
+            .openPopup();
+            map.setView([userLatitude, userLongitude], 16);
+        }, function (error) {
+            console.error("Error getting user's location:", error);
+            alert("Unable to retrieve your location.");
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
+const R1_West_Park_Icon = L.icon({
+    iconUrl: './img/R1_West_Park.svg', 
+    iconSize: [35, 41], 
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R10_Orchid_Icon = L.icon({
+    iconUrl: './img/R10_Orchid.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R11_Ameenee_Icon = L.icon({
+    iconUrl: './img/R11_Ameenee.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R12_Sosun_Icon = L.icon({
+    iconUrl: './img/R12_Sosun.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R13_Villimale_Internal_Icon = L.icon({
+    iconUrl: './img/R13_Villimale_Internal.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R14_VILLIMALE_INTERNAL_2_Icon = L.icon({
+    iconUrl: './img/R14_VILLIMALE_INTERNAL_2.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R2_Carnival_to_HM_Phase_1_Icon = L.icon({
+    iconUrl: './img/R2_Carnival_to_HM_Phase_1.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R3_West_Park_to_VIA_Icon = L.icon({
+    iconUrl: './img/R3_West_Park_to_VIA.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R4_HM_Phase_1_to_VIA_Icon = L.icon({
+    iconUrl: './img/R4_HM_Phase_1_to_VIA.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R5_HM_Internal_Icon = L.icon({
+    iconUrl: './img/R5_HM_Internal.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R6_HM_Phase_2_to_HM_Phase_1_Icon = L.icon({
+    iconUrl: './img/R6_HM_Phase_2_to_HM_Phase_1.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R7_HM_Phase_2_to_West_Park_Icon = L.icon({
+    iconUrl: './img/R7_HM_Phase_2_to_West_Park.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R8_HM_Phase_2_to_Carnival_Icon = L.icon({
+    iconUrl: './img/R8_HM_Phase_2_to_Carnival.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+const R9_HM_Phase_2_to_VIA_Icon = L.icon({
+    iconUrl: './img/R9_HM_Phase_2_to_VIA.svg', 
+    iconSize: [35, 41],
+    iconAnchor: [12, 41], 
+    popupAnchor: [6, -34], 
+    shadowUrl: './img/marker-shadow.png', 
+    shadowSize: [41, 41] 
+});
+
+
+
+
+function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000; 
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180; 
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c;
+    return distance;
+}
+
+function calculateSpeed(lat1, lon1, lat2, lon2, timeInSeconds) {
+    const distance = haversine(lat1, lon1, lat2, lon2); 
+    const speed = distance / timeInSeconds;
+
+    const speedKmH = (speed * 3600) / 1000;
+
+    return {
+        distanceInMeters: distance,
+        speedInMetersPerSecond: speed,
+        speedInKmPerHour: speedKmH
+    };
+}
+
+
+let beforeChange = []; 
+
+        function updateBusLocations(routeCode, icon) {
+            const url = 'https://bo.rtl.mv:4455/maldives/api/booking/v1/bus/livecoordinates';
+            const headers = {
+                "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS, DELETE",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://rtl.mv",
+                "Accept": "application/json, text/plain, */*",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Origin": "https://rtl.mv",
+                "Sec-Fetch-Site": "same-site",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Dest": "empty",
+                "Referer": "https://rtl.mv/",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Priority": "u=1, i",
+                "Connection": "keep-alive"
+            };
+            const routeName = routeCodeToNameMap[routeCode];
+            const data = {
+                routeCode: routeCode
+            };
+            let busname = icon
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json()) 
+            .then(data => {
+                console.log('Response:', data); 
+
+                data.busList.forEach(bus => {
+const existingBus = beforeChange.find(item => item.busplate === bus.plateNumber);
+
+const busKey = bus.plateNumber;
+
+
+if (busMarkers[busKey]) {
+                const currentMarker = busMarkers[busKey];
+                const oldLat = currentMarker.getLatLng().lat;
+                const oldLon = currentMarker.getLatLng().lng;
+                if (oldLat !== bus.latitude || oldLon !== bus.longitude) {
+                    const timeInSeconds = 12; 
+                    const speedData = calculateSpeed(oldLat, oldLon, bus.latitude, bus.longitude, timeInSeconds);
+                    currentMarker.setLatLng([bus.latitude, bus.longitude]);
+                    currentMarker.setPopupContent(`<b>Bus: ${routeName}<br>Speed: ${speedData.speedInKmPerHour.toFixed(2)} km/h</b><br>Plate Number: ${bus.plateNumber}`);
+                }
+            } else {
+                let marker = L.marker([bus.latitude, bus.longitude], { icon: icon })
+                    .addTo(map)
+                    .bindPopup(`<b>Bus: ${routeName}<br>Speed: 0 km/h</b><br>Plate Number: ${bus.plateNumber}`);
+                busMarkers[busKey] = marker;
+            }
+        });
+    })
+
+.catch(error => {
+    console.error('Error:', error);
+    });
+}
+
+setInterval(() => {
+updateBusLocations("133", R1_West_Park_Icon);
+updateBusLocations("122", R10_Orchid_Icon);
+updateBusLocations("121", R11_Ameenee_Icon);
+updateBusLocations("130", R12_Sosun_Icon);
+updateBusLocations("131", R13_Villimale_Internal_Icon);
+updateBusLocations("145", R14_VILLIMALE_INTERNAL_2_Icon);
+updateBusLocations("132", R2_Carnival_to_HM_Phase_1_Icon);
+updateBusLocations("123", R3_West_Park_to_VIA_Icon);
+updateBusLocations("124", R4_HM_Phase_1_to_VIA_Icon);
+updateBusLocations("125", R5_HM_Internal_Icon);
+updateBusLocations("126", R6_HM_Phase_2_to_HM_Phase_1_Icon);
+updateBusLocations("127", R7_HM_Phase_2_to_West_Park_Icon);
+updateBusLocations("128", R8_HM_Phase_2_to_Carnival_Icon);
+updateBusLocations("129", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("103", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("107", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("104", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("105", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("108", R9_HM_Phase_2_to_VIA_Icon);
+}, 3000);
+        
+updateBusLocations("133", R1_West_Park_Icon);
+updateBusLocations("122", R10_Orchid_Icon);
+updateBusLocations("121", R11_Ameenee_Icon);
+updateBusLocations("130", R12_Sosun_Icon);
+updateBusLocations("131", R13_Villimale_Internal_Icon);
+updateBusLocations("145", R14_VILLIMALE_INTERNAL_2_Icon);
+updateBusLocations("132", R2_Carnival_to_HM_Phase_1_Icon);
+updateBusLocations("123", R3_West_Park_to_VIA_Icon);
+updateBusLocations("124", R4_HM_Phase_1_to_VIA_Icon);
+updateBusLocations("125", R5_HM_Internal_Icon);
+updateBusLocations("126", R6_HM_Phase_2_to_HM_Phase_1_Icon);
+updateBusLocations("127", R7_HM_Phase_2_to_West_Park_Icon);
+updateBusLocations("128", R8_HM_Phase_2_to_Carnival_Icon);
+updateBusLocations("129", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("103", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("107", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("104", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("105", R9_HM_Phase_2_to_VIA_Icon);
+updateBusLocations("108", R9_HM_Phase_2_to_VIA_Icon);
+</script>
+</body>
+</html>
